@@ -2,157 +2,115 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>PiTip - Support with Pi</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Pi Tip Jar</title>
   <script src="https://sdk.minepi.com/pi-sdk.js"></script>
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600&display=swap" rel="stylesheet" />
   <style>
+    :root {
+      --pi-purple: #8f54ff;
+      --bg-light: #ffffff;
+      --bg-dark: #121212;
+      --text-light: #000000;
+      --text-dark: #ffffff;
+      --card-bg-light: #f9f9f9;
+      --card-bg-dark: #1e1e1e;
+    }
+
     body {
-      font-family: 'Inter', sans-serif;
-      background: #f6f2fc;
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
       margin: 0;
       padding: 0;
-      text-align: center;
-      color: #333;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      min-height: 100vh;
+      background-color: var(--bg-light);
+      color: var(--text-light);
+      transition: all 0.3s ease-in-out;
     }
+
     .container {
-      margin: 60px auto;
-      padding: 30px;
-      background: white;
-      max-width: 420px;
-      border-radius: 20px;
-      box-shadow: 0 10px 25px rgba(0,0,0,0.08);
+      text-align: center;
+      padding: 2rem;
+      border-radius: 1rem;
+      background-color: var(--card-bg-light);
+      box-shadow: 0 0 15px rgba(0, 0, 0, 0.1);
+      max-width: 500px;
+      width: 90%;
     }
-    .pi-logo {
-      width: 80px;
-      margin-bottom: 20px;
-    }
+
     h1 {
-      color: #612b9b;
-      margin-bottom: 0;
+      color: var(--pi-purple);
+      font-size: 2rem;
     }
-    h2 {
-      font-size: 18px;
-      font-weight: 400;
-      color: #666;
-      margin-top: 4px;
-      margin-bottom: 25px;
-    }
-    p {
-      font-size: 15px;
-      margin-bottom: 25px;
-      color: #555;
-    }
-    button {
-      background-color: #fdbb30;
-      color: #612b9b;
-      padding: 12px 24px;
-      border: none;
-      border-radius: 8px;
-      cursor: pointer;
-      font-size: 16px;
-      font-weight: 600;
-      margin: 8px;
-      transition: all 0.2s ease-in-out;
-    }
-    button:hover {
-      background-color: #f79f1f;
+
+    .btn {
+      margin-top: 1rem;
+      padding: 0.75rem 1.5rem;
+      background-color: var(--pi-purple);
       color: white;
+      border: none;
+      border-radius: 0.5rem;
+      cursor: pointer;
+      font-size: 1rem;
     }
-    .message {
-      margin-top: 20px;
-      font-size: 15px;
-      color: green;
-      font-weight: 500;
+
+    .btn:hover {
+      background-color: #753de4;
     }
-    footer {
-      margin-top: 40px;
-      font-size: 13px;
-      color: #666;
-    }
-    footer a {
-      color: #612b9b;
-      text-decoration: none;
-      margin: 0 10px;
-    }
-    footer a:hover {
+
+    .toggle {
+      margin-top: 1rem;
+      cursor: pointer;
+      font-size: 0.9rem;
+      color: var(--pi-purple);
       text-decoration: underline;
     }
   </style>
 </head>
 <body>
+  <div class="container">
+    <h1>💜 Pi Tip Jar</h1>
+    <p id="status">Connecting to Pi Network...</p>
+    <button class="btn" id="loginBtn">Login with Pi</button>
+    <p class="toggle" id="toggleTheme">Switch to Dark Mode</p>
+  </div>
 
-<div class="container">
-  <!-- Pi Logo SVG -->
-  <svg class="pi-logo" viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg">
-    <circle cx="50" cy="50" r="48" fill="#612b9b" stroke="#fdbb30" stroke-width="4"/>
-    <text x="50%" y="55%" text-anchor="middle" font-size="42" fill="#fdbb30" font-family="Arial" dy=".3em">π</text>
-  </svg>
+  <script>
+    const statusEl = document.getElementById("status");
+    const loginBtn = document.getElementById("loginBtn");
+    const toggleTheme = document.getElementById("toggleTheme");
 
-  <h1>PiTip 💰</h1>
-  <h2>Your Pi, your power to support learners.</h2>
-  <p>Support this student developer with a small Pi tip! Every contribution helps me keep learning and building.</p>
+    // Theme toggling
+    let darkMode = false;
+    toggleTheme.addEventListener("click", () => {
+      darkMode = !darkMode;
+      document.body.style.backgroundColor = darkMode ? getComputedStyle(document.documentElement).getPropertyValue('--bg-dark') : getComputedStyle(document.documentElement).getPropertyValue('--bg-light');
+      document.body.style.color = darkMode ? getComputedStyle(document.documentElement).getPropertyValue('--text-dark') : getComputedStyle(document.documentElement).getPropertyValue('--text-light');
+      document.querySelector('.container').style.backgroundColor = darkMode ? getComputedStyle(document.documentElement).getPropertyValue('--card-bg-dark') : getComputedStyle(document.documentElement).getPropertyValue('--card-bg-light');
+      toggleTheme.textContent = darkMode ? "Switch to Light Mode" : "Switch to Dark Mode";
+    });
 
-  <button id="loginBtn">Login with Pi</button>
-  <br/>
-  <button id="tipBtn" style="display:none;">Send Tip (0.1 Pi)</button>
-
-  <div class="message" id="message"></div>
-</div>
-
-<footer>
-  <a href="privacy.html" target="_blank">Privacy Policy</a> | 
-  <a href="terms.html" target="_blank">Terms of Use</a>
-</footer>
-
-<script>
-  const loginBtn = document.getElementById('loginBtn');
-  const tipBtn = document.getElementById('tipBtn');
-  const messageBox = document.getElementById('message');
-
-  let piUser = null;
-
-  loginBtn.addEventListener('click', async () => {
-    try {
-      const scopes = ['payments'];
-      const user = await window.Pi.authenticate(
-        scopes,
-        onIncompletePaymentFound,
-        { sandbox: true } // Sandbox mode enabled for testing
-      );
-      piUser = user;
-      messageBox.style.color = 'green';
-      messageBox.innerText = `Welcome, @${user.username}!`;
-      loginBtn.style.display = 'none';
-      tipBtn.style.display = 'inline-block';
-    } catch (error) {
-      messageBox.style.color = 'red';
-      messageBox.innerText = 'Login failed. Make sure you are in Pi Browser and sandbox mode is enabled.';
-      console.error(error);
+    function onIncompletePaymentFound(payment) {
+      console.log("Incomplete payment found:", payment);
     }
-  });
 
-  tipBtn.addEventListener('click', async () => {
-    try {
-      const payment = await Pi.createPayment({
-        amount: 0.1,
-        memo: "Thanks for supporting this student 💜",
-        metadata: { type: "tip" },
-      });
-      messageBox.style.color = 'green';
-      messageBox.innerText = '✅ Tip sent successfully. Thank you!';
-      console.log('Payment successful:', payment);
-    } catch (error) {
-      messageBox.style.color = 'red';
-      messageBox.innerText = '❌ Payment canceled or failed.';
-      console.error(error);
-    }
-  });
+    loginBtn.addEventListener("click", async () => {
+      if (!window.Pi) {
+        statusEl.textContent = "Pi SDK not loaded. Make sure you're in the Pi Browser.";
+        return;
+      }
 
-  function onIncompletePaymentFound(payment) {
-    console.log('Found incomplete payment:', payment);
-  }
-</script>
-
+      try {
+        const user = await window.Pi.authenticate(['payments'], onIncompletePaymentFound, { sandbox: true });
+        statusEl.textContent = `Welcome, @${user.username}! 🎉`;
+        console.log("Authenticated user:", user);
+      } catch (error) {
+        console.error("Login failed:", error);
+        statusEl.textContent = "Login failed. Are you in Pi Browser and Sandbox Mode enabled?";
+      }
+    });
+  </script>
 </body>
 </html>
