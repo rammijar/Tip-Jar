@@ -1,0 +1,104 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>PiTip - Pi Network Tip Jar</title>
+  <script src="https://sdk.minepi.com/pi-sdk.js"></script>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      background: #f0f4f8;
+      margin: 0;
+      padding: 0;
+      text-align: center;
+    }
+    .container {
+      margin: 50px auto;
+      padding: 20px;
+      background: white;
+      max-width: 400px;
+      border-radius: 12px;
+      box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+    }
+    h1 {
+      color: #f79f1f;
+    }
+    button {
+      background-color: #f79f1f;
+      color: white;
+      padding: 12px 20px;
+      border: none;
+      border-radius: 8px;
+      cursor: pointer;
+      font-size: 16px;
+    }
+    button:hover {
+      background-color: #e67e22;
+    }
+    .message {
+      margin-top: 20px;
+      font-size: 16px;
+      color: green;
+    }
+  </style>
+</head>
+<body>
+
+<div class="container">
+  <h1>PiTip 💰</h1>
+  <p>Hello, I'm a student learning to code. If you'd like to support me, please send a small Pi tip!</p>
+
+  <button id="loginBtn">Login with Pi</button>
+  <br><br>
+  <button id="tipBtn" style="display:none;">Send Tip (0.1 Pi)</button>
+
+  <div class="message" id="message"></div>
+</div>
+
+<script>
+  const loginBtn = document.getElementById('loginBtn');
+  const tipBtn = document.getElementById('tipBtn');
+  const messageBox = document.getElementById('message');
+
+  // Store user information
+  let piUser = null;
+
+  loginBtn.addEventListener('click', async () => {
+    try {
+      const scopes = ['payments'];
+      const user = await window.Pi.authenticate(scopes, onIncompletePaymentFound);
+      piUser = user;
+      messageBox.innerText = `Welcome, ${user.username}!`;
+      loginBtn.style.display = 'none';
+      tipBtn.style.display = 'inline-block';
+    } catch (error) {
+      messageBox.innerText = 'Login failed.';
+      console.error(error);
+    }
+  });
+
+  tipBtn.addEventListener('click', async () => {
+    try {
+      const payment = await Pi.createPayment({
+        amount: 0.1,
+        memo: "Thanks for the tip! 💜",
+        metadata: { type: "tip" },
+      });
+
+      messageBox.innerText = 'Tip sent successfully. Thank you!';
+      console.log('Payment successful:', payment);
+    } catch (error) {
+      messageBox.innerText = 'Payment canceled or failed.';
+      console.error(error);
+    }
+  });
+
+  // This runs if Pi finds any incomplete payments
+  function onIncompletePaymentFound(payment) {
+    console.log('Incomplete payment:', payment);
+  }
+</script>
+
+</body>
+</html>
