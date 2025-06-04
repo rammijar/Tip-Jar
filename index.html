@@ -1,116 +1,655 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Pi Tip Jar</title>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Pi Network Tip Jar</title>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
   <script src="https://sdk.minepi.com/pi-sdk.js"></script>
   <style>
     :root {
-      --pi-purple: #8f54ff;
+      --primary: #8f54ff;
+      --primary-dark: #6c3ce0;
       --bg-light: #ffffff;
       --bg-dark: #121212;
-      --text-light: #000000;
-      --text-dark: #ffffff;
-      --card-bg-light: #f9f9f9;
-      --card-bg-dark: #1e1e1e;
+      --card-light: #f8f9ff;
+      --card-dark: #1e1e2e;
+      --text-light: #2d3748;
+      --text-dark: #e2e8f0;
+      --success: #48bb78;
+      --error: #e53e3e;
+      --warning: #ed8936;
+      --gray-light: #e2e8f0;
+      --gray-dark: #2d3748;
+      --shadow-light: 0 4px 20px rgba(0, 0, 0, 0.08);
+      --shadow-dark: 0 4px 20px rgba(0, 0, 0, 0.3);
+      --transition: all 0.3s ease;
+    }
+
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+      font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
     }
 
     body {
-      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-      margin: 0;
-      padding: 0;
+      background: linear-gradient(135deg, #667eea, #764ba2);
+      color: var(--text-light);
+      min-height: 100vh;
       display: flex;
       flex-direction: column;
       align-items: center;
       justify-content: center;
-      min-height: 100vh;
-      background-color: var(--bg-light);
-      color: var(--text-light);
-      transition: all 0.3s ease-in-out;
+      padding: 1.5rem;
+      transition: var(--transition);
+    }
+
+    body.dark-mode {
+      background: linear-gradient(135deg, #2c3e50, #1a1a2e);
+      color: var(--text-dark);
     }
 
     .container {
-      text-align: center;
-      padding: 2rem;
-      border-radius: 1rem;
-      background-color: var(--card-bg-light);
-      box-shadow: 0 0 15px rgba(0, 0, 0, 0.1);
-      max-width: 500px;
-      width: 90%;
+      width: 100%;
+      max-width: 480px;
+      background: var(--card-light);
+      border-radius: 20px;
+      overflow: hidden;
+      box-shadow: var(--shadow-light);
+      transition: var(--transition);
+      position: relative;
     }
 
-    h1 {
-      color: var(--pi-purple);
-      font-size: 2rem;
+    body.dark-mode .container {
+      background: var(--card-dark);
+      box-shadow: var(--shadow-dark);
+    }
+
+    .header {
+      background: linear-gradient(to right, var(--primary), var(--primary-dark));
+      padding: 1.5rem;
+      text-align: center;
+      color: white;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .header::before {
+      content: "";
+      position: absolute;
+      top: -50%;
+      left: -50%;
+      width: 200%;
+      height: 200%;
+      background: radial-gradient(circle, rgba(255,255,255,0.1) 0%, rgba(255,255,255,0) 70%);
+      transform: rotate(30deg);
+    }
+
+    .logo {
+      display: flex;
+      justify-content: center;
+      margin-bottom: 1rem;
+    }
+
+    .logo svg {
+      width: 80px;
+      height: 80px;
+    }
+
+    .logo-icon {
+      fill: white;
+    }
+
+    .app-title {
+      font-size: 1.8rem;
+      font-weight: 700;
+      margin-bottom: 0.5rem;
+      letter-spacing: 0.5px;
+    }
+
+    .app-subtitle {
+      font-size: 1rem;
+      opacity: 0.9;
+      font-weight: 400;
+    }
+
+    .content {
+      padding: 2rem;
+    }
+
+    .card {
+      background: white;
+      border-radius: 16px;
+      padding: 1.5rem;
+      margin-bottom: 1.5rem;
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+      transition: var(--transition);
+    }
+
+    body.dark-mode .card {
+      background: rgba(30, 30, 46, 0.6);
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+    }
+
+    .card-title {
+      font-size: 1.25rem;
+      margin-bottom: 1rem;
+      color: var(--primary);
+      font-weight: 600;
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+    }
+
+    .card-title svg {
+      width: 24px;
+      height: 24px;
+    }
+
+    .status-container {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 1rem;
+      padding: 1.5rem 0;
+      text-align: center;
+    }
+
+    .status-icon {
+      width: 64px;
+      height: 64px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      background: rgba(143, 84, 255, 0.1);
+      border-radius: 50%;
+      margin-bottom: 0.5rem;
+    }
+
+    .status-icon svg {
+      width: 36px;
+      height: 36px;
+    }
+
+    .status-icon .pi-icon {
+      fill: var(--primary);
+    }
+
+    .status-text {
+      font-size: 1.1rem;
+      font-weight: 500;
+      margin-bottom: 0.5rem;
+    }
+
+    .status-detail {
+      font-size: 0.95rem;
+      opacity: 0.8;
+      line-height: 1.5;
+      max-width: 320px;
     }
 
     .btn {
-      margin-top: 1rem;
-      padding: 0.75rem 1.5rem;
-      background-color: var(--pi-purple);
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      background: var(--primary);
       color: white;
       border: none;
-      border-radius: 0.5rem;
-      cursor: pointer;
+      padding: 0.9rem 1.8rem;
       font-size: 1rem;
+      font-weight: 600;
+      border-radius: 12px;
+      cursor: pointer;
+      transition: var(--transition);
+      box-shadow: 0 4px 12px rgba(143, 84, 255, 0.3);
+      gap: 0.5rem;
+      width: 100%;
+      max-width: 280px;
     }
 
     .btn:hover {
-      background-color: #753de4;
+      background: var(--primary-dark);
+      transform: translateY(-2px);
+      box-shadow: 0 6px 16px rgba(143, 84, 255, 0.4);
     }
 
-    .toggle {
-      margin-top: 1rem;
+    .btn:active {
+      transform: translateY(0);
+    }
+
+    .btn-secondary {
+      background: transparent;
+      border: 2px solid var(--primary);
+      color: var(--primary);
+      box-shadow: none;
+    }
+
+    .btn-secondary:hover {
+      background: rgba(143, 84, 255, 0.1);
+    }
+
+    .tip-amounts {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 0.75rem;
+      margin: 1.5rem 0;
+    }
+
+    .tip-option {
+      background: white;
+      border: 2px solid var(--gray-light);
+      border-radius: 12px;
+      padding: 1rem 0.5rem;
+      text-align: center;
       cursor: pointer;
-      font-size: 0.9rem;
-      color: var(--pi-purple);
-      text-decoration: underline;
+      transition: var(--transition);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 0.25rem;
+    }
+
+    body.dark-mode .tip-option {
+      background: rgba(30, 30, 46, 0.5);
+      border-color: var(--gray-dark);
+    }
+
+    .tip-option:hover {
+      border-color: var(--primary);
+    }
+
+    .tip-option.selected {
+      border-color: var(--primary);
+      background: rgba(143, 84, 255, 0.1);
+      box-shadow: 0 4px 12px rgba(143, 84, 255, 0.15);
+    }
+
+    .tip-amount {
+      font-size: 1.1rem;
+      font-weight: 700;
+      color: var(--primary);
+    }
+
+    .tip-label {
+      font-size: 0.8rem;
+      opacity: 0.8;
+    }
+
+    .theme-toggle {
+      position: absolute;
+      top: 1.5rem;
+      right: 1.5rem;
+      background: rgba(255, 255, 255, 0.2);
+      border: none;
+      width: 44px;
+      height: 44px;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      transition: var(--transition);
+      backdrop-filter: blur(4px);
+      z-index: 10;
+    }
+
+    .theme-toggle:hover {
+      background: rgba(255, 255, 255, 0.3);
+      transform: rotate(15deg);
+    }
+
+    .theme-toggle svg {
+      width: 24px;
+      height: 24px;
+      fill: white;
+    }
+
+    .footer {
+      padding: 1.5rem;
+      text-align: center;
+      font-size: 0.85rem;
+      opacity: 0.8;
+      border-top: 1px solid rgba(0, 0, 0, 0.05);
+      transition: var(--transition);
+    }
+
+    body.dark-mode .footer {
+      border-top: 1px solid rgba(255, 255, 255, 0.05);
+    }
+
+    .footer-links {
+      display: flex;
+      justify-content: center;
+      gap: 1.5rem;
+      margin-top: 0.5rem;
+    }
+
+    .footer-link {
+      color: var(--primary);
+      text-decoration: none;
+      transition: var(--transition);
+    }
+
+    .footer-link:hover {
+      opacity: 0.8;
+    }
+
+    .hidden {
+      display: none;
+    }
+
+    .loading {
+      display: inline-block;
+      width: 20px;
+      height: 20px;
+      border: 3px solid rgba(255, 255, 255, 0.3);
+      border-radius: 50%;
+      border-top-color: white;
+      animation: spin 1s ease-in-out infinite;
+    }
+
+    @keyframes spin {
+      to { transform: rotate(360deg); }
+    }
+
+    /* Responsive design */
+    @media (max-width: 480px) {
+      .content {
+        padding: 1.5rem;
+      }
+      
+      .tip-amounts {
+        grid-template-columns: repeat(2, 1fr);
+      }
+      
+      .app-title {
+        font-size: 1.5rem;
+      }
     }
   </style>
 </head>
 <body>
   <div class="container">
-    <h1>💜 Pi Tip Jar</h1>
-    <p id="status">Connecting to Pi Network...</p>
-    <button class="btn" id="loginBtn">Login with Pi</button>
-    <p class="toggle" id="toggleTheme">Switch to Dark Mode</p>
+    <div class="header">
+      <button class="theme-toggle" id="themeToggle">
+        <svg viewBox="0 0 24 24">
+          <path d="M12,18C11.11,18 10.26,17.8 9.5,17.45C11.56,16.5 13,14.42 13,12C13,9.58 11.56,7.5 9.5,6.55C10.26,6.2 11.11,6 12,6A6,6 0 0,1 18,12A6,6 0 0,1 12,18M20,8.69V4H15.31L12,0.69L8.69,4H4V8.69L0.69,12L4,15.31V20H8.69L12,23.31L15.31,20H20V15.31L23.31,12L20,8.69Z" />
+        </svg>
+      </button>
+      
+      <div class="logo">
+        <svg viewBox="0 0 100 100">
+          <circle cx="50" cy="50" r="45" fill="#8f54ff"/>
+          <path d="M50 20 A30 30 0 1 1 50 80 A30 30 0 1 1 50 20 Z" fill="white"/>
+          <text x="50" y="55" text-anchor="middle" fill="#8f54ff" font-size="40" font-weight="bold">π</text>
+        </svg>
+      </div>
+      
+      <h1 class="app-title">Pi Network Tip Jar</h1>
+      <p class="app-subtitle">Support creators with cryptocurrency</p>
+    </div>
+    
+    <div class="content">
+      <div class="card">
+        <div class="status-container" id="statusContainer">
+          <div class="status-icon">
+            <svg viewBox="0 0 24 24" class="pi-icon">
+              <path d="M12,2A10,10 0 0,0 2,12A10,10 0 0,0 12,22A10,10 0 0,0 22,12A10,10 0 0,0 12,2M17,16V15L16,14V11.5A0.5,0.5 0 0,0 15.5,11A0.5,0.5 0 0,0 15,11.5V14H14V11.5A0.5,0.5 0 0,0 13.5,11A0.5,0.5 0 0,0 13,11.5V14H12V11.5A0.5,0.5 0 0,0 11.5,11A0.5,0.5 0 0,0 11,11.5V16.5L10,15.5V17L12.5,19L15,17V15.5L14,16.5V12.75A1.75,1.75 0 0,1 15.75,11A1.75,1.75 0 0,1 17.5,12.75V15L17,16Z" />
+            </svg>
+          </div>
+          <p class="status-text" id="statusText">Connecting to Pi Network...</p>
+          <p class="status-detail" id="statusDetail">Please make sure you're using the Pi Browser app</p>
+        </div>
+        
+        <div id="loginSection">
+          <button class="btn" id="loginBtn">
+            <svg viewBox="0 0 24 24" width="20" height="20">
+              <path fill="currentColor" d="M21.35,11.1H12.18V13.83H18.69C18.36,17.64 15.19,19.27 12.19,19.27C8.36,19.27 5,16.25 5,12C5,7.9 8.2,4.73 12.2,4.73C15.29,4.73 17.1,6.7 17.1,6.7L19,4.72C19,4.72 16.56,2 12.1,2C6.42,2 2.03,6.8 2.03,12C2.03,17.05 6.16,22 12.25,22C17.6,22 21.5,18.33 21.5,12.91C21.5,11.76 21.35,11.1 21.35,11.1V11.1Z" />
+            </svg>
+            Sign in with Pi Network
+          </button>
+        </div>
+        
+        <div id="userSection" class="hidden">
+          <h3 class="card-title">
+            <svg viewBox="0 0 24 24" width="24" height="24">
+              <path fill="currentColor" d="M12,4A4,4 0 0,1 16,8A4,4 0 0,1 12,12A4,4 0 0,1 8,8A4,4 0 0,1 12,4M12,14C16.42,14 20,15.79 20,18V20H4V18C4,15.79 7.58,14 12,14Z" />
+            </svg>
+            Welcome, <span id="username">User</span>!
+          </h3>
+          
+          <p style="margin-bottom: 1rem;">Select tip amount:</p>
+          
+          <div class="tip-amounts">
+            <div class="tip-option" data-amount="0.1">
+              <div class="tip-amount">0.1 π</div>
+              <div class="tip-label">Small Tip</div>
+            </div>
+            <div class="tip-option selected" data-amount="0.5">
+              <div class="tip-amount">0.5 π</div>
+              <div class="tip-label">Medium Tip</div>
+            </div>
+            <div class="tip-option" data-amount="1">
+              <div class="tip-amount">1 π</div>
+              <div class="tip-label">Large Tip</div>
+            </div>
+            <div class="tip-option" data-amount="5">
+              <div class="tip-amount">5 π</div>
+              <div class="tip-label">Generous</div>
+            </div>
+          </div>
+          
+          <button class="btn" id="sendTipBtn">
+            <svg viewBox="0 0 24 24" width="20" height="20">
+              <path fill="currentColor" d="M2.01 21L23 12 2.01 3 2 10l15 2-15 2z" />
+            </svg>
+            Send Tip
+          </button>
+          
+          <button class="btn btn-secondary" id="logoutBtn" style="margin-top: 0.75rem;">
+            <svg viewBox="0 0 24 24" width="20" height="20">
+              <path fill="currentColor" d="M16,17V14H9V10H16V7L21,12L16,17M14,2A2,2 0 0,1 16,4V6H14V4H5V20H14V18H16V20A2,2 0 0,1 14,22H5A2,2 0 0,1 3,20V4A2,2 0 0,1 5,2H14Z" />
+            </svg>
+            Logout
+          </button>
+        </div>
+      </div>
+      
+      <div class="card" id="paymentProcessing" class="hidden">
+        <h3 class="card-title">
+          <svg viewBox="0 0 24 24" width="24" height="24">
+            <path fill="currentColor" d="M12,4V2A10,10 0 0,0 2,12H4A8,8 0 0,1 12,4Z" />
+          </svg>
+          Processing Payment
+        </h3>
+        
+        <div class="status-container">
+          <div class="status-icon">
+            <svg viewBox="0 0 24 24" width="36" height="36">
+              <path fill="currentColor" d="M12,4a8,8 0 0,1 7.89,6.7A1.53,1.53 0 0,0 21.38,12h0.24a1.55,1.55 0 0,0 1.48-1.75,11 11 0 0,0-21.72,0A1.54,1.54 0 0,0 2.38,12h0.25a1.53,1.53 0 0,0 1.49-1.3A8,8 0 0,1 12,4Z">
+                <animateTransform attributeName="transform" type="rotate" from="0 12 12" to="360 12 12" dur="0.75s" repeatCount="indefinite" />
+              </path>
+            </svg>
+          </div>
+          <p class="status-text">Processing your payment</p>
+          <p class="status-detail">Please confirm the transaction in your Pi app</p>
+        </div>
+      </div>
+      
+      <div class="card" id="successSection" class="hidden">
+        <h3 class="card-title">
+          <svg viewBox="0 0 24 24" width="24" height="24">
+            <path fill="currentColor" d="M12 2C6.5 2 2 6.5 2 12S6.5 22 12 22 22 17.5 22 12 17.5 2 12 2M10 17L5 12L6.41 10.59L10 14.17L17.59 6.58L19 8L10 17Z" />
+          </svg>
+          Payment Successful!
+        </h3>
+        
+        <div class="status-container">
+          <div class="status-icon" style="background: rgba(72, 187, 120, 0.1);">
+            <svg viewBox="0 0 24 24" width="36" height="36" style="fill: var(--success);">
+              <path d="M12 2C6.5 2 2 6.5 2 12S6.5 22 12 22 22 17.5 22 12 17.5 2 12 2M10 17L5 12L6.41 10.59L10 14.17L17.59 6.58L19 8L10 17Z" />
+            </svg>
+          </div>
+          <p class="status-text">Thank you for your support!</p>
+          <p class="status-detail">Your tip of <strong id="tipAmount">0.5 π</strong> was successfully sent</p>
+          
+          <button class="btn" id="newTipBtn" style="margin-top: 1rem;">
+            <svg viewBox="0 0 24 24" width="20" height="20">
+              <path fill="currentColor" d="M19,13H13V19H11V13H5V11H11V5H13V11H19V13Z" />
+            </svg>
+            Send Another Tip
+          </button>
+        </div>
+      </div>
+    </div>
+    
+    <div class="footer">
+      <p>Pi Network Tip Jar v1.0</p>
+      <div class="footer-links">
+        <a href="#" class="footer-link">Privacy Policy</a>
+        <a href="#" class="footer-link">Terms of Service</a>
+        <a href="#" class="footer-link">Help Center</a>
+      </div>
+    </div>
   </div>
-
+  
   <script>
-    const statusEl = document.getElementById("status");
-    const loginBtn = document.getElementById("loginBtn");
-    const toggleTheme = document.getElementById("toggleTheme");
-
-    // Theme toggling
+    // DOM Elements
+    const statusText = document.getElementById('statusText');
+    const statusDetail = document.getElementById('statusDetail');
+    const loginBtn = document.getElementById('loginBtn');
+    const logoutBtn = document.getElementById('logoutBtn');
+    const sendTipBtn = document.getElementById('sendTipBtn');
+    const newTipBtn = document.getElementById('newTipBtn');
+    const themeToggle = document.getElementById('themeToggle');
+    const loginSection = document.getElementById('loginSection');
+    const userSection = document.getElementById('userSection');
+    const paymentProcessing = document.getElementById('paymentProcessing');
+    const successSection = document.getElementById('successSection');
+    const usernameEl = document.getElementById('username');
+    const tipAmountEl = document.getElementById('tipAmount');
+    const tipOptions = document.querySelectorAll('.tip-option');
+    
+    // App state
+    let currentUser = null;
+    let selectedTipAmount = 0.5;
     let darkMode = false;
-    toggleTheme.addEventListener("click", () => {
+    
+    // Initialize Pi SDK
+    Pi.init({ version: "2.0", sandbox: true });
+    
+    // Theme toggle
+    themeToggle.addEventListener('click', () => {
       darkMode = !darkMode;
-      document.body.style.backgroundColor = darkMode ? getComputedStyle(document.documentElement).getPropertyValue('--bg-dark') : getComputedStyle(document.documentElement).getPropertyValue('--bg-light');
-      document.body.style.color = darkMode ? getComputedStyle(document.documentElement).getPropertyValue('--text-dark') : getComputedStyle(document.documentElement).getPropertyValue('--text-light');
-      document.querySelector('.container').style.backgroundColor = darkMode ? getComputedStyle(document.documentElement).getPropertyValue('--card-bg-dark') : getComputedStyle(document.documentElement).getPropertyValue('--card-bg-light');
-      toggleTheme.textContent = darkMode ? "Switch to Light Mode" : "Switch to Dark Mode";
+      document.body.classList.toggle('dark-mode', darkMode);
+      
+      // Update theme toggle icon
+      const icon = themeToggle.querySelector('svg');
+      if (darkMode) {
+        icon.innerHTML = '<path d="M12,2A10,10 0 0,1 22,12A10,10 0 0,1 12,22A10,10 0 0,1 2,12A10,10 0 0,1 12,2M12,4A8,8 0 0,0 4,12A8,8 0 0,0 12,20A8,8 0 0,0 20,12A8,8 0 0,0 12,4Z" />';
+      } else {
+        icon.innerHTML = '<path d="M12,18C11.11,18 10.26,17.8 9.5,17.45C11.56,16.5 13,14.42 13,12C13,9.58 11.56,7.5 9.5,6.55C10.26,6.2 11.11,6 12,6A6,6 0 0,1 18,12A6,6 0 0,1 12,18M20,8.69V4H15.31L12,0.69L8.69,4H4V8.69L0.69,12L4,15.31V20H8.69L12,23.31L15.31,20H20V15.31L23.31,12L20,8.69Z" />';
+      }
     });
-
-    function onIncompletePaymentFound(payment) {
-      console.log("Incomplete payment found:", payment);
-    }
-
-    loginBtn.addEventListener("click", async () => {
+    
+    // Tip amount selection
+    tipOptions.forEach(option => {
+      option.addEventListener('click', () => {
+        tipOptions.forEach(opt => opt.classList.remove('selected'));
+        option.classList.add('selected');
+        selectedTipAmount = parseFloat(option.dataset.amount);
+      });
+    });
+    
+    // Login with Pi
+    loginBtn.addEventListener('click', async () => {
       if (!window.Pi) {
-        statusEl.textContent = "Pi SDK not loaded. Make sure you're in the Pi Browser.";
+        updateStatus('Pi SDK not loaded', 'Please use the Pi Browser app');
         return;
       }
-
+      
       try {
-        const user = await window.Pi.authenticate(['payments'], onIncompletePaymentFound, { sandbox: true });
-        statusEl.textContent = `Welcome, @${user.username}! 🎉`;
-        console.log("Authenticated user:", user);
+        loginBtn.innerHTML = '<div class="loading"></div> Authenticating...';
+        
+        const user = await Pi.authenticate(['username', 'payments'], 'pi-tip-jar');
+        currentUser = user;
+        
+        // Update UI
+        usernameEl.textContent = user.user.username;
+        loginSection.classList.add('hidden');
+        userSection.classList.remove('hidden');
+        
+        updateStatus('Authentication successful', `Welcome, @${user.user.username}!`);
+        loginBtn.innerHTML = 'Sign in with Pi Network';
       } catch (error) {
-        console.error("Login failed:", error);
-        statusEl.textContent = "Login failed. Are you in Pi Browser and Sandbox Mode enabled?";
+        console.error('Login failed:', error);
+        updateStatus('Authentication failed', 'Please try again or check Pi Browser');
+        loginBtn.innerHTML = 'Sign in with Pi Network';
       }
     });
+    
+    // Logout
+    logoutBtn.addEventListener('click', () => {
+      Pi.logout();
+      currentUser = null;
+      userSection.classList.add('hidden');
+      loginSection.classList.remove('hidden');
+      updateStatus('Logged out', 'Connect with Pi to send tips');
+    });
+    
+    // Send tip
+    sendTipBtn.addEventListener('click', async () => {
+      if (!currentUser) return;
+      
+      try {
+        // Show processing
+        userSection.classList.add('hidden');
+        paymentProcessing.classList.remove('hidden');
+        
+        const paymentData = {
+          amount: selectedTipAmount,
+          memo: `Tip for great content! (${selectedTipAmount} π)`,
+          metadata: { 
+            userId: currentUser.user.uid,
+            tipJar: true 
+          }
+        };
+        
+        const payment = await Pi.createPayment(paymentData);
+        
+        // Simulate backend approval
+        setTimeout(() => {
+          payment.resolve();
+          
+          // Show success
+          paymentProcessing.classList.add('hidden');
+          tipAmountEl.textContent = `${selectedTipAmount} π`;
+          successSection.classList.remove('hidden');
+        }, 3000);
+        
+      } catch (error) {
+        console.error('Payment error:', error);
+        paymentProcessing.classList.add('hidden');
+        userSection.classList.remove('hidden');
+        updateStatus('Payment failed', 'Please try again');
+      }
+    });
+    
+    // New tip button
+    newTipBtn.addEventListener('click', () => {
+      successSection.classList.add('hidden');
+      userSection.classList.remove('hidden');
+    });
+    
+    // Update status messages
+    function updateStatus(text, detail) {
+      statusText.textContent = text;
+      if (detail) statusDetail.textContent = detail;
+    }
+    
+    // Initial status
+    updateStatus('Pi Network Tip Jar', 'Connect your account to send tips');
   </script>
 </body>
 </html>
